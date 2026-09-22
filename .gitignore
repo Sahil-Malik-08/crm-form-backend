@@ -1,0 +1,8 @@
+node_modules
+uploads
+.env
+*.log
+server.log
+server.err.log
+server.runtime.log
+server.runtime.err.log
