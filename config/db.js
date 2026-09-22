@@ -6,24 +6,30 @@ require('dotenv').config();
 
 const DB_NAME = process.env.DB_NAME || 'company_dashboard';
 
-// Create pool without database first to ensure DB exists
-const initPool = mysql.createPool({
+const baseConnection = {
   host: process.env.DB_HOST || 'localhost',
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   waitForConnections: true,
+  queueLimit: 0,
+};
+
+// Hosted providers like Aiven, PlanetScale, etc. require TLS on every connection.
+if (process.env.DB_SSL === 'true') {
+  baseConnection.ssl = { rejectUnauthorized: false };
+}
+
+// Create pool without database first to ensure DB exists
+const initPool = mysql.createPool({
+  ...baseConnection,
   connectionLimit: 2,
-  queueLimit: 0
 });
 
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
+  ...baseConnection,
   database: DB_NAME,
-  waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
 });
 
 async function migrateRoleIndex() {
