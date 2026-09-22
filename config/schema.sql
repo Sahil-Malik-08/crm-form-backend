@@ -193,23 +193,25 @@ SELECT 'Employee Form', '[{"label":"Full Name","type":"text","required":true},{"
 WHERE NOT EXISTS (SELECT 1 FROM employee_form_templates WHERE title = 'Employee Form');
 
 -- Add missing columns/constraints for schema migrations
-ALTER TABLE employee_form_responses ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'pending';
-ALTER TABLE employee_form_responses ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMP NULL DEFAULT NULL;
-ALTER TABLE customers ADD COLUMN IF NOT EXISTS sales_person VARCHAR(100) DEFAULT NULL;
-ALTER TABLE master_cities ADD COLUMN IF NOT EXISTS state_id INT DEFAULT NULL;
-ALTER TABLE contacts ADD COLUMN IF NOT EXISTS birthday DATE DEFAULT NULL;
-ALTER TABLE contacts ADD COLUMN IF NOT EXISTS gender VARCHAR(20) DEFAULT NULL;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(150) DEFAULT NULL;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS branch VARCHAR(150) DEFAULT NULL;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'Active';
-ALTER TABLE employees ADD COLUMN IF NOT EXISTS employee_code VARCHAR(50) DEFAULT NULL;
-ALTER TABLE employees ADD COLUMN IF NOT EXISTS branch VARCHAR(150) DEFAULT NULL;
-ALTER TABLE employees ADD COLUMN IF NOT EXISTS employee_type VARCHAR(50) DEFAULT NULL;
-ALTER TABLE employees ADD COLUMN IF NOT EXISTS gender VARCHAR(30) DEFAULT NULL;
-ALTER TABLE employees ADD COLUMN IF NOT EXISTS date_of_birth DATE DEFAULT NULL;
-ALTER TABLE employees ADD COLUMN IF NOT EXISTS marital_status VARCHAR(30) DEFAULT NULL;
-ALTER TABLE employees ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'Active';
-ALTER TABLE master_roles ADD COLUMN IF NOT EXISTS department_id INT DEFAULT NULL;
+-- Note: no "IF NOT EXISTS" here — standard MySQL doesn't support that clause on
+-- ADD COLUMN (only MariaDB does). db.js already catches ER_DUP_FIELDNAME on rerun.
+ALTER TABLE employee_form_responses ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'pending';
+ALTER TABLE employee_form_responses ADD COLUMN reviewed_at TIMESTAMP NULL DEFAULT NULL;
+ALTER TABLE customers ADD COLUMN sales_person VARCHAR(100) DEFAULT NULL;
+ALTER TABLE master_cities ADD COLUMN state_id INT DEFAULT NULL;
+ALTER TABLE contacts ADD COLUMN birthday DATE DEFAULT NULL;
+ALTER TABLE contacts ADD COLUMN gender VARCHAR(20) DEFAULT NULL;
+ALTER TABLE users ADD COLUMN email VARCHAR(150) DEFAULT NULL;
+ALTER TABLE users ADD COLUMN branch VARCHAR(150) DEFAULT NULL;
+ALTER TABLE users ADD COLUMN status VARCHAR(30) NOT NULL DEFAULT 'Active';
+ALTER TABLE employees ADD COLUMN employee_code VARCHAR(50) DEFAULT NULL;
+ALTER TABLE employees ADD COLUMN branch VARCHAR(150) DEFAULT NULL;
+ALTER TABLE employees ADD COLUMN employee_type VARCHAR(50) DEFAULT NULL;
+ALTER TABLE employees ADD COLUMN gender VARCHAR(30) DEFAULT NULL;
+ALTER TABLE employees ADD COLUMN date_of_birth DATE DEFAULT NULL;
+ALTER TABLE employees ADD COLUMN marital_status VARCHAR(30) DEFAULT NULL;
+ALTER TABLE employees ADD COLUMN status VARCHAR(30) NOT NULL DEFAULT 'Active';
+ALTER TABLE master_roles ADD COLUMN department_id INT DEFAULT NULL;
 ALTER TABLE master_roles ADD CONSTRAINT fk_roles_department FOREIGN KEY (department_id) REFERENCES master_departments(id) ON DELETE SET NULL;
 
 -- Seed default departments without duplicating records when the server restarts.
