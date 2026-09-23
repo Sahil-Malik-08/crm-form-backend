@@ -63,6 +63,11 @@ const DEPARTMENT_ROLES = {
     'Team Lead', 'Assistant Vice President', 'Regional Head', 'Business Unit Head', 'Managing Director',
     'President', 'admin', 'manager', 'supervisor', 'executive',
   ],
+  Accounts: [
+    'Accountant', 'Senior Accountant', 'Accounts Executive', 'Accounts Manager', 'Accounts Payable Specialist',
+    'Accounts Receivable Specialist', 'Finance Manager', 'Finance Executive', 'Financial Analyst',
+    'Auditor', 'Internal Auditor', 'Tax Consultant', 'Payroll Executive', 'Bookkeeper', 'Cost Accountant',
+  ],
 };
 
 module.exports = { STATES_CITIES, INDUSTRIES, DEPARTMENT_ROLES };
