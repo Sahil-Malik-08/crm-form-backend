@@ -159,7 +159,8 @@ CREATE TABLE IF NOT EXISTS employee_forms (
   fields TEXT NOT NULL,
   created_by INT DEFAULT NULL,
   created_by_name VARCHAR(150) DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS employee_form_responses (
@@ -177,9 +178,12 @@ CREATE TABLE IF NOT EXISTS employee_form_templates (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(200) NOT NULL,
   fields TEXT NOT NULL,
+  assigned_to VARCHAR(20) NOT NULL DEFAULT 'all',
+  approved_by INT DEFAULT NULL,
   created_by INT DEFAULT NULL,
   created_by_name VARCHAR(150) DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 INSERT INTO employee_form_templates (title, fields)
@@ -213,6 +217,10 @@ ALTER TABLE employees ADD COLUMN marital_status VARCHAR(30) DEFAULT NULL;
 ALTER TABLE employees ADD COLUMN status VARCHAR(30) NOT NULL DEFAULT 'Active';
 ALTER TABLE master_roles ADD COLUMN department_id INT DEFAULT NULL;
 ALTER TABLE master_roles ADD CONSTRAINT fk_roles_department FOREIGN KEY (department_id) REFERENCES master_departments(id) ON DELETE SET NULL;
+ALTER TABLE employee_form_templates ADD COLUMN assigned_to VARCHAR(20) NOT NULL DEFAULT 'all';
+ALTER TABLE employee_form_templates ADD COLUMN approved_by INT DEFAULT NULL;
+ALTER TABLE employee_form_templates ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+ALTER TABLE employee_forms ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
 -- Seed default departments without duplicating records when the server restarts.
 INSERT INTO master_departments (name)

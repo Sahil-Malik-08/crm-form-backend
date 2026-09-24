@@ -16,6 +16,7 @@ const toForm = (row) => ({
   approvedByName: row.approved_by_name || null,
   createdByName: row.created_by_name,
   createdAt: row.created_at,
+  updatedAt: row.updated_at,
   fields: parseJson(row.fields, []),
 });
 
