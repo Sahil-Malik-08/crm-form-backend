@@ -23,8 +23,8 @@ const app = express();
 
 app.use(securityHeaders);
 app.use(corsMiddleware);
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(sanitizeBody);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
