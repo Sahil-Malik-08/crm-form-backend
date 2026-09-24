@@ -16,10 +16,6 @@ const validatePasswordStrength = (password) => {
   return null;
 };
 
-const MAX_FAILED_ATTEMPTS = 5;
-const LOCKOUT_MINUTES = 15;
-const accountLockoutEnabled = process.env.DISABLE_ACCOUNT_LOCKOUT !== 'true';
-
 exports.signup = async (req, res) => {
   const { fullName, username, password, phone = null, department = null } = req.body;
   if (!fullName || !username || !password) return res.status(400).json({ message: 'Name, username, and password are required.' });
@@ -39,22 +35,10 @@ exports.login = async (req, res) => {
   const [[user]] = await db.execute('SELECT * FROM users WHERE username = ? OR email = ? LIMIT 1', [username, username]);
   if (!user) return res.status(401).json({ message: 'Incorrect username or password.' });
 
-  if (accountLockoutEnabled && user.locked_until && new Date(user.locked_until) > new Date()) {
-    const minutesLeft = Math.ceil((new Date(user.locked_until) - new Date()) / 60000);
-    return res.status(423).json({ message: `Account locked due to too many failed attempts. Try again in ${minutesLeft} minutes.` });
-  }
-
+  // No lockout after failed attempts: a wrong password just fails, and the user can retry right away.
   const valid = await bcrypt.compare(password || '', user.password_hash);
-  if (!valid) {
-    const failedAttempts = (user.failed_attempts || 0) + 1;
-    const lockedUntil = accountLockoutEnabled && failedAttempts >= MAX_FAILED_ATTEMPTS
-      ? new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000).toISOString()
-      : null;
-    await db.execute('UPDATE users SET failed_attempts = ?, locked_until = ? WHERE id = ?', [failedAttempts, lockedUntil, user.id]);
-    return res.status(401).json({ message: 'Incorrect username or password.' });
-  }
+  if (!valid) return res.status(401).json({ message: 'Incorrect username or password.' });
 
-  await db.execute('UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE id = ?', [user.id]);
   res.json({ token: jwt.sign(userPayload(user), jwtSecret, { expiresIn: '8h' }), user: userPayload(user) });
 };
 

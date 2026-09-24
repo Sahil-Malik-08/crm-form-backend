@@ -15,7 +15,7 @@ const formRoutes = require('./routes/formRoutes');
 const formTemplateRoutes = require('./routes/formTemplateRoutes');
 
 const { authenticate } = require('./middleware/auth');
-const { authLimiter, generalLimiter, strictLimiter } = require('./middleware/rateLimiter');
+const { generalLimiter, strictLimiter } = require('./middleware/rateLimiter');
 const { corsMiddleware, securityHeaders } = require('./middleware/security');
 const { sanitizeBody } = require('./middleware/validation');
 
@@ -30,9 +30,6 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const asyncRoute = handler => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
-app.use('/api/auth/login', authLimiter);
-app.use('/api/auth/signup', authLimiter);
-app.use('/api/auth/forgot-password', authLimiter);
 app.use('/api/auth', generalLimiter, authRoutes);
 
 app.use('/api/employees', authenticate, strictLimiter, employeeRoutes);

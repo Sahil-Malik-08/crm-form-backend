@@ -5,7 +5,6 @@ const multer = require('multer');
 const router = express.Router();
 const authController = require('../controllers/authController');
 const { authenticate } = require('../middleware/auth');
-const { authLimiter } = require('../middleware/rateLimiter');
 const { requireFields } = require('../middleware/validation');
 
 const uploadsDir = path.join(__dirname, '..', 'uploads');
@@ -19,9 +18,9 @@ const upload = multer({
   fileFilter: (_req, file, callback) => callback(null, ['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)),
 });
 
-router.post('/login', authLimiter, requireFields(['username', 'password']), authController.login);
-router.post('/signup', authLimiter, requireFields(['fullName', 'username', 'password']), authController.signup);
-router.post('/forgot-password', authLimiter, requireFields(['username', 'newPassword']), authController.forgotPassword);
+router.post('/login', requireFields(['username', 'password']), authController.login);
+router.post('/signup', requireFields(['fullName', 'username', 'password']), authController.signup);
+router.post('/forgot-password', requireFields(['username', 'newPassword']), authController.forgotPassword);
 router.get('/profile', authenticate, authController.getProfile);
 router.put('/profile', authenticate, requireFields(['fullName', 'username']), authController.updateProfile);
 router.post('/profile/photo', authenticate, upload.single('photo'), authController.updateProfileImage);
