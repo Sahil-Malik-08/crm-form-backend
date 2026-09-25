@@ -2,6 +2,7 @@ const xss = require('xss');
 const db = require('../config/db');
 
 const FIELD_TYPES = ['text', 'number', 'date', 'email', 'textarea', 'checkbox', 'select', 'multiselect'];
+const MASTER_KEYS = ['departments', 'roles', 'states', 'cities'];
 const isAdmin = (user) => String(user?.role || '').trim().toLowerCase() === 'admin';
 const clean = (value) => xss(String(value ?? '').trim());
 const parseJson = (value, fallback) => {
@@ -50,6 +51,7 @@ const normalizeFields = (rawFields) => (Array.isArray(rawFields) ? rawFields : [
     type: FIELD_TYPES.includes(field?.type) ? field.type : 'text',
     required: field?.required !== false,
     options: Array.isArray(field?.options) ? field.options.map(clean).filter(Boolean).slice(0, 50) : [],
+    ...(MASTER_KEYS.includes(field?.masterKey) ? { masterKey: field.masterKey } : {}),
   }))
   .filter((field) => field.label);
 
